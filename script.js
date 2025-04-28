@@ -1,22 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // --- Element References ---
+  const loginScreen = document.getElementById('login-screen');
+  const registerScreen = document.getElementById('register-screen');
+  const mainApp = document.getElementById('main-app');
+  const authScreens = document.querySelectorAll('.auth-screen');
+  const tabScreens = document.querySelectorAll('.tab-screen');
+  const bottomNavButtons = document.querySelectorAll('.bottom-nav .nav-button');
+  const overlayScreens = document.querySelectorAll('.overlay-screen');
+
   // --- State Management ---
-  let currentScreen = 'login-screen'; // Initial screen
-  const screens = document.querySelectorAll('.screen'); // Get all screen elements
-  const bottomNavButtons = document.querySelectorAll('.bottom-nav .nav-button'); // Get all bottom nav buttons
+  let isLoggedIn = false; // Track login state
+  let currentTabScreen = 'records-screen'; // Track active main tab screen
+  let activeOverlay = null; // Track active overlay screen ID
 
-  // Mock Data (replace with actual data fetching in a real app)
-  const mockUserData = {
-    name: 'Edgar "Agu" A',
-    id: '1565990',
-    isPremium: true,
-  };
-
-  const mockRecordsSummary = {
-    totalExpenses: 1191779,
-    totalIncome: 4239000,
-    balance: 3047221,
-  };
-
+  // Mock Data (Same as before)
+  const mockUserData = { name: 'Edgar "Agu" A', id: '1565990', isPremium: true };
+  const mockRecordsSummary = { totalExpenses: 1191779, totalIncome: 4239000, balance: 3047221 };
   const mockTransactions = [
     {
       id: 1,
@@ -90,7 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
       description: 'ara',
       category: { name: 'Groceries', icon: 'shopping-bag' },
     },
-    // Add more mock data to simulate scrolling
     {
       id: 10,
       date: '2025-04-22T18:00:00Z',
@@ -116,17 +114,8 @@ document.addEventListener('DOMContentLoaded', () => {
       category: { name: 'Food', icon: 'coffee' },
     },
   ];
-
   const mockAccounts = [
-    {
-      id: 1,
-      name: 'Default',
-      description: 'Personal cash book',
-      type: 'Cash',
-      isVIP: false,
-      isLocked: false,
-      isSelected: true,
-    }, // Mark default as selected
+    { id: 1, name: 'Default', description: 'Personal cash book', type: 'Cash', isVIP: false, isLocked: false },
     {
       id: 2,
       name: 'Team cash book',
@@ -134,7 +123,6 @@ document.addEventListener('DOMContentLoaded', () => {
       type: 'Shared',
       isVIP: true,
       isLocked: true,
-      isSelected: false,
     },
     {
       id: 3,
@@ -143,19 +131,10 @@ document.addEventListener('DOMContentLoaded', () => {
       type: 'Business',
       isVIP: true,
       isLocked: true,
-      isSelected: false,
     },
-    {
-      id: 4,
-      name: 'Savings Account',
-      description: 'Bank savings',
-      type: 'Bank',
-      isVIP: false,
-      isLocked: false,
-      isSelected: false,
-    },
+    { id: 4, name: 'Savings Account', description: 'Bank savings', type: 'Bank', isVIP: false, isLocked: false },
   ];
-  let selectedAccountId = mockAccounts.find((acc) => acc.isSelected)?.id || null;
+  let selectedAccountId = mockAccounts[0].id; // Default to the first account
 
   const mockCategories = {
     Expense: [
@@ -186,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
       { id: 25, name: 'Kids', icon: 'smile', type: 'Expense' },
       { id: 26, name: 'Vegetables', icon: 'carrot', type: 'Expense' },
       { id: 27, name: 'Fruits', icon: 'feather', type: 'Expense' },
-      { id: 'add', name: 'Settings', icon: 'plus', type: 'Action' }, // Special '+' item
+      { id: 'add', name: 'Settings', icon: 'plus', type: 'Action' },
     ],
     Income: [
       { id: 101, name: 'Salary', icon: 'dollar-sign', type: 'Income' },
@@ -195,55 +174,91 @@ document.addEventListener('DOMContentLoaded', () => {
       { id: 104, name: 'Gift', icon: 'gift', type: 'Income' },
       { id: 'add', name: 'Settings', icon: 'plus', type: 'Action' },
     ],
-    Transfer: [
-      { id: 201, name: 'Between My Accounts', icon: 'repeat', type: 'Transfer' },
-      // No '+' for Transfer categories based on screenshot/common sense
-    ],
+    Transfer: [{ id: 201, name: 'Between My Accounts', icon: 'repeat', type: 'Transfer' }],
   };
 
-  // --- Helper Functions ---
+  // --- Navigation Functions ---
 
-  // Function to show a specific screen and hide others
-  function showScreen(screenId) {
-    screens.forEach((screen) => {
-      screen.classList.remove('active');
-    });
+  // Show/Hide Auth Screens
+  function showAuthScreen(screenId) {
+    authScreens.forEach((screen) => screen.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
-    currentScreen = screenId;
+    mainApp.classList.add('hidden'); // Hide main app
+    isLoggedIn = false;
+    // Clear auth forms on switch
+    document.getElementById('login-form').reset();
+    document.getElementById('login-error').textContent = '';
+    document.getElementById('register-form').reset();
+    document.getElementById('register-error').textContent = '';
+  }
+
+  // Show Main App (after login)
+  function showMainApp() {
+    authScreens.forEach((screen) => screen.classList.remove('active'));
+    mainApp.classList.remove('hidden'); // Show main app
+    isLoggedIn = true;
+    showTabScreen('records-screen'); // Default to Records tab after login
+  }
+
+  // Show a specific main tab screen
+  function showTabScreen(screenId) {
+    // Hide all tab screens
+    tabScreens.forEach((screen) => screen.classList.remove('active'));
+    // Show the target tab screen
+    document.getElementById(screenId).classList.add('active');
+    currentTabScreen = screenId; // Update state
 
     // Update bottom nav active state
     bottomNavButtons.forEach((button) => {
-      if (button.dataset.screen === screenId) {
+      // Check data-screen, but exclude the FAB which triggers overlay
+      if (button.dataset.screen === screenId && !button.classList.contains('fab')) {
         button.classList.add('active');
       } else {
         button.classList.remove('active');
       }
     });
 
-    // Re-replace Feather icons on the new screen content
-    feather.replace();
+    // Hide any active overlay when switching main tabs
+    hideOverlay();
 
     // Trigger screen-specific rendering/updates
     updateScreenContent(screenId);
   }
 
+  // Show an overlay screen
+  function showOverlay(overlayId) {
+    // Hide all overlays first (defensive)
+    overlayScreens.forEach((overlay) => overlay.classList.remove('active'));
+    // Show the target overlay
+    document.getElementById(overlayId).classList.add('active');
+    activeOverlay = overlayId; // Update state
+
+    // Trigger screen-specific rendering for the overlay
+    updateScreenContent(overlayId);
+  }
+
+  // Hide the active overlay
+  function hideOverlay() {
+    if (activeOverlay) {
+      document.getElementById(activeOverlay).classList.remove('active');
+      activeOverlay = null; // Clear state
+    }
+  }
+
   // Function to update content of screens when they become active
   function updateScreenContent(screenId) {
-    // Hide all placeholder messages initially
-    document
-      .querySelectorAll('.loading-indicator, .error-message, .no-data-message')
-      .forEach((el) => el.classList.add('hidden'));
+    // Hide all placeholder messages within this screen
+    const screenElement = document.getElementById(screenId);
+    if (screenElement) {
+      screenElement
+        .querySelectorAll('.loading-indicator, .error-message, .no-data-message')
+        .forEach((el) => el.classList.add('hidden'));
+    }
 
     switch (screenId) {
       case 'login-screen':
-        // Clear form/error on showing login
-        document.getElementById('login-form').reset();
-        document.getElementById('login-error').textContent = '';
-        break;
       case 'register-screen':
-        // Clear form/error on showing register
-        document.getElementById('register-form').reset();
-        document.getElementById('register-error').textContent = '';
+        // Forms are handled by reset/error message logic in showAuthScreen
         break;
       case 'records-screen':
         // Fetch/Render Records data (mock data here)
@@ -251,24 +266,23 @@ document.addEventListener('DOMContentLoaded', () => {
         break;
       case 'charts-screen':
         // Fetch/Render Charts data (mock data here)
+        // Render with default/current chart state (e.g., Expense, Month, Feb 2025)
         // Note: Period logic isn't fully implemented here, just initial render
         renderChartsScreen('Expense', 'Month', new Date(2025, 1, 1)); // Example: Feb 2025
         break;
       case 'reports-screen':
-        // Fetch/Render Reports data (mock data here)
-        renderReportsScreen(mockAccounts); // Pass mock accounts for Accounts tab
-        // Default to Accounts tab
+        // Render Accounts Report content by default
         showReportTab('accounts');
         break;
       case 'profile-screen':
         // Render Profile data (mock data here)
         renderProfileScreen(mockUserData);
         break;
-      case 'add-transaction-screen':
+      case 'add-transaction-overlay':
         // Render categories for the default type (Expense)
         renderCategories('Expense');
         // Reset segmented control to Expense
-        document.querySelectorAll('#add-transaction-screen .segmented-control .segment').forEach((segment) => {
+        document.querySelectorAll('#add-transaction-overlay .segmented-control .segment').forEach((segment) => {
           if (segment.dataset.transactionType === 'Expense') {
             segment.classList.add('active');
           } else {
@@ -276,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         });
         break;
-      case 'account-selection-screen':
+      case 'account-selection-overlay':
         // Render account list for selection
         renderAccountSelection(mockAccounts, selectedAccountId);
         break;
@@ -285,17 +299,20 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(`Screen ${screenId} needs rendering logic.`);
         break;
     }
+
+    // Re-replace Feather icons on the active screen content
+    feather.replace();
   }
 
-  // Format numbers with commas
+  // Format numbers with commas (Same as before)
   function formatAmount(amount) {
     return Math.abs(amount).toLocaleString();
   }
 
-  // Group transactions by date (simplified)
+  // Group transactions by date (Same as before)
   function groupTransactionsByDate(txns) {
     const sectionsMap = txns.reduce((acc, txn) => {
-      const date = new Date(txn.date).toISOString().split('T')[0]; // Use date string as key
+      const date = new Date(txn.date).toISOString().split('T')[0];
       if (!acc[date]) {
         acc[date] = {
           title: date,
@@ -310,7 +327,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return acc;
     }, {});
 
-    // Convert map to array of sections, sorted by date descending
     return Object.keys(sectionsMap)
       .sort((a, b) => new Date(b) - new Date(a))
       .map((date) => ({
@@ -322,7 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }));
   }
 
-  // --- Render Functions for Each Screen ---
+  // --- Render Functions --- (Mostly same as before, targeting specific IDs)
 
   function renderRecordsScreen(transactions, summary) {
     const summaryValuesEl = document.querySelector('#records-screen .summary-values');
@@ -332,12 +348,10 @@ document.addEventListener('DOMContentLoaded', () => {
       summaryValuesEl.querySelector('.summary-value:not(.expense):not(.income)').textContent = `${
         summary.balance >= 0 ? '+' : '-'
       }${formatAmount(summary.balance)}`;
-    } else {
-      // Handle no summary data
     }
 
-    const transactionListEl = document.querySelector('#records-screen .transaction-list');
-    transactionListEl.innerHTML = ''; // Clear current list
+    const transactionListEl = document.getElementById('records-transaction-list');
+    transactionListEl.innerHTML = '';
 
     if (!transactions || transactions.length === 0) {
       document.getElementById('records-no-data').classList.remove('hidden');
@@ -370,38 +384,29 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // Replace icons after injecting new HTML
-    feather.replace();
-
-    // Add click listeners to transaction items (example)
+    // Add click listeners to transaction items
     transactionListEl.querySelectorAll('.transaction-item').forEach((item) => {
       item.addEventListener('click', () => {
         const transactionId = item.dataset.transactionId;
         alert(`Navigate to transaction details for ID: ${transactionId}`);
-        // In a real app: showScreen('transaction-details-screen', { transactionId: transactionId });
       });
     });
+    feather.replace(); // Replace new icons
   }
 
   function renderChartsScreen(chartType, periodType, date) {
-    // Update header title (simplified)
     document.querySelector(
       '#charts-screen .header-title'
     ).innerHTML = `${chartType} <i data-feather="chevron-down" class="dropdown-arrow"></i>`;
-    feather.replace(); // Update icon
+    feather.replace();
 
-    // Update period text
     const periodTextEl = document.getElementById('charts-current-period');
     if (periodType === 'Month') {
       periodTextEl.textContent = date.toLocaleString('en-US', { month: 'short', year: 'numeric' });
     } else {
-      // Year
       periodTextEl.textContent = date.getFullYear();
     }
 
-    // --- Simulate Chart Data & Rendering ---
-    // In a real app, fetch data based on chartType, periodType, date
-    // For this example, we'll just use fixed mock data from screenshot 3
     const mockChartData = {
       total: 1191000,
       categories: [
@@ -411,16 +416,13 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: 'Vegetables', amount: 223000, percentage: 18.71, color: '#4BC0C0', icon: 'carrot' },
         { name: 'Transportation', amount: 29500, percentage: 2.47, color: '#9966CC', icon: 'truck' },
         { name: 'Food', amount: 24000, percentage: 2.01, color: '#FF9F40', icon: 'coffee' },
-        // Note: Percentages in screenshot sum to > 100%. Using adjusted amounts/percentages here.
       ].sort((a, b) => b.amount - a.amount),
     };
 
-    // Update chart center text
-    document.getElementById('charts-total-amount').textContent = `+${formatAmount(mockChartData.total)}`; // Screenshot shows '+', keep it
+    document.getElementById('charts-total-amount').textContent = `+${formatAmount(mockChartData.total)}`;
 
-    // Render category list
-    const categoryListEl = document.querySelector('#charts-screen .category-list');
-    categoryListEl.innerHTML = ''; // Clear list
+    const categoryListEl = document.getElementById('charts-category-list');
+    categoryListEl.innerHTML = '';
 
     if (!mockChartData.categories || mockChartData.categories.length === 0) {
       document.getElementById('charts-no-data').classList.remove('hidden');
@@ -441,21 +443,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderReportsScreen(accounts) {
-    // Update Accounts tab summary (mock data)
     const summaryCardEl = document.querySelector('#accounts-report-content .summary-card');
     if (summaryCardEl) {
-      // Ensure element exists
-      document.getElementById('net-worth-value').textContent = formatAmount(0); // Mock value
-      document.getElementById('assets-value').textContent = formatAmount(0); // Mock value
-      document.getElementById('liabilities-value').textContent = formatAmount(0); // Mock value
+      document.getElementById('net-worth-value').textContent = formatAmount(0);
+      document.getElementById('assets-value').textContent = formatAmount(0);
+      document.getElementById('liabilities-value').textContent = formatAmount(0);
     }
-
-    // Render Account List for Account Selection Overlay (This is rendered separately)
-    // renderAccountSelection(accounts, selectedAccountId); // Call this when showing the overlay
+    // Account list rendering is handled by renderAccountSelection for the overlay
   }
 
   function renderProfileScreen(userData) {
-    // Update profile details
     const profileNameEl = document.querySelector('.profile-name');
     const profileIdEl = document.querySelector('.profile-id');
     const premiumStatusEl = document.querySelector('.premium-status-row .item-description');
@@ -465,26 +462,22 @@ document.addEventListener('DOMContentLoaded', () => {
       profileNameEl.textContent = userData.name;
       profileIdEl.textContent = `ID:${userData.id}`;
       premiumStatusEl.textContent = userData.isPremium ? 'Premium Member' : 'Free Member';
-      // Visually indicate premium status on the row (optional, CSS handles color)
 
-      // Hide/show Block Ads based on premium status (example)
       if (blockAdsItem) {
         if (userData.isPremium) {
-          blockAdsItem.style.display = 'none'; // Hide if premium
+          blockAdsItem.style.display = 'none';
         } else {
-          blockAdsItem.style.display = 'flex'; // Show if not premium (default is flex from list-item)
+          blockAdsItem.style.display = 'flex';
         }
       }
-    } else {
-      // Handle no user data state
     }
   }
 
   function renderCategories(type) {
     const categoryGridEl = document.getElementById('category-grid');
-    categoryGridEl.innerHTML = ''; // Clear current grid
+    categoryGridEl.innerHTML = '';
 
-    const categories = mockCategories[type]; // Get categories for the type
+    const categories = mockCategories[type];
 
     if (!categories || categories.length === 0) {
       document.getElementById('add-transaction-no-data').classList.remove('hidden');
@@ -503,9 +496,6 @@ document.addEventListener('DOMContentLoaded', () => {
       categoryGridEl.insertAdjacentHTML('beforeend', itemHtml);
     });
 
-    // Replace icons after injecting new HTML
-    feather.replace();
-
     // Add click listeners to category items
     categoryGridEl.querySelectorAll('.category-grid-item').forEach((item) => {
       item.addEventListener('click', () => {
@@ -515,18 +505,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (categoryId === 'add') {
           alert(`Navigate to Add Category screen for type: ${categoryType}`);
-          // In a real app: showScreen('add-category-screen', { type: categoryType });
         } else {
           alert(`Navigate to Transaction Form for ${categoryType}: ${categoryName} (ID: ${categoryId})`);
-          // In a real app: showScreen('transaction-form-screen', { type: categoryType, categoryId: categoryId });
         }
+        // In a real app, you would likely hide the overlay here: hideOverlay();
       });
     });
+    feather.replace(); // Replace new icons
   }
 
   function renderAccountSelection(accounts, currentSelectedId) {
     const accountListEl = document.getElementById('account-list');
-    accountListEl.innerHTML = ''; // Clear list
+    accountListEl.innerHTML = '';
 
     if (!accounts || accounts.length === 0) {
       document.getElementById('account-selection-no-data').classList.remove('hidden');
@@ -554,80 +544,97 @@ document.addEventListener('DOMContentLoaded', () => {
       accountListEl.insertAdjacentHTML('beforeend', itemHtml);
     });
 
-    // Replace icons after injecting new HTML
-    feather.replace();
-
     // Add click listeners to account items
     accountListEl.querySelectorAll('.account-item').forEach((item) => {
       item.addEventListener('click', () => {
-        const accountId = parseInt(item.dataset.accountId, 10); // Get ID
-        const account = accounts.find((acc) => acc.id === accountId);
+        const accountId = parseInt(item.dataset.accountId, 10);
+        const account = mockAccounts.find((acc) => acc.id === accountId); // Use mockAccounts directly
 
         if (account && account.isLocked) {
           alert('This is a VIP feature. Please upgrade.');
-          // In a real app: showScreen('premium-screen');
         } else if (account) {
           selectedAccountId = accountId; // Update the global state
           // Update UI to show checkmark on selected item
           accountListEl.querySelectorAll('.account-item').forEach((accItem) => accItem.classList.remove('selected'));
           item.classList.add('selected'); // Add a class for visual selection if needed
 
-          // Re-render Records screen with the new account filter (simulated)
-          alert(`Account selected: ${account.name}. Re-rendering Records screen.`);
-          // In a real app: fetch and render transactions for selectedAccountId
-          // For this mock, we'll just close the modal and state is updated
-          showScreen('records-screen'); // Go back to records
-          // Call updateScreenContent('records-screen') if you wanted to re-render the list immediately
+          alert(`Account selected: ${account.name}. Transaction list would update.`);
+          // In a real app: Re-fetch and render transactions for the new selectedAccountId on the Records screen
+          hideOverlay(); // Close the overlay
+          // You might need to call updateScreenContent('records-screen') here
+          // if the records screen was already active and needs to refresh its list
         }
       });
     });
+    feather.replace(); // Replace new icons
+  }
+
+  // Helper to show content for the selected report tab (Analytics/Accounts)
+  function showReportTab(tabName) {
+    document.getElementById('accounts-report-content').classList.add('hidden');
+    document.getElementById('analytics-report-content').classList.add('hidden');
+
+    // Update segmented control active state
+    document.querySelectorAll('#reports-screen .segmented-control .segment').forEach((segment) => {
+      if (segment.dataset.reportTab === tabName) {
+        segment.classList.add('active');
+      } else {
+        segment.classList.remove('active');
+      }
+    });
+
+    if (tabName === 'accounts') {
+      document.getElementById('accounts-report-content').classList.remove('hidden');
+      // In a real app, call render function for accounts report data
+      renderReportsScreen(mockAccounts); // Re-render account summary on tab switch
+    } else if (tabName === 'analytics') {
+      document.getElementById('analytics-report-content').classList.remove('hidden');
+      // In a real app, call render function for analytics report data
+    }
   }
 
   // --- Event Listeners ---
 
   // Login Form Submission
   document.getElementById('login-form').addEventListener('submit', (event) => {
-    event.preventDefault(); // Prevent actual form submission
-
+    event.preventDefault();
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
     const errorElement = document.getElementById('login-error');
 
     // Simple mock validation
     if (email === 'test@example.com' && password === 'password') {
-      errorElement.textContent = ''; // Clear error
-      alert('Login successful!'); // Simulate success
-      showScreen('records-screen'); // Navigate to Records screen
+      errorElement.textContent = '';
+      // Simulate successful login and show main app
+      showMainApp();
     } else {
-      errorElement.textContent = 'Invalid email or password.'; // Show error
+      errorElement.textContent = 'Invalid email or password.';
     }
   });
 
   // Register Link Click
   document.getElementById('show-register').addEventListener('click', (event) => {
     event.preventDefault();
-    showScreen('register-screen');
+    showAuthScreen('register-screen');
   });
 
   // Login Link Click (from Register)
   document.getElementById('show-login').addEventListener('click', (event) => {
     event.preventDefault();
-    showScreen('login-screen');
+    showAuthScreen('login-screen');
   });
 
   // Bottom Navigation Clicks
   bottomNavButtons.forEach((button) => {
     button.addEventListener('click', () => {
       const screenId = button.dataset.screen;
-      // Special handling for Add Transaction FAB (shows overlay)
-      if (screenId === 'add-transaction') {
-        showScreen('add-transaction-screen');
-        // Don't mark FAB as 'active' in bottom nav, keep the previous screen active
-        document.querySelector('.bottom-nav .nav-button.fab').classList.remove('active'); // Remove active class from FAB
-        // Revert active class to the screen that was active before the modal
-        document.querySelector(`.bottom-nav .nav-button[data-screen="${currentScreen}"]`).classList.add('active');
+
+      if (button.classList.contains('fab')) {
+        // FAB button triggers an overlay
+        showOverlay(screenId);
       } else {
-        showScreen(screenId);
+        // Regular nav button triggers a main tab screen
+        showTabScreen(screenId);
       }
     });
   });
@@ -636,8 +643,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document
     .querySelector('#records-screen .header i[data-feather="menu"]')
     .parentElement.addEventListener('click', () => {
-      // Simulate showing the Account Selection overlay
-      showScreen('account-selection-screen');
+      showOverlay('account-selection-overlay'); // Show account selection overlay
     });
   document
     .querySelector('#records-screen .header i[data-feather="search"]')
@@ -653,12 +659,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Records Screen Month/Year Select Click (Mock dropdown)
   document.querySelector('#records-screen .month-year-select').addEventListener('click', () => {
     alert('Month/Year selection dropdown not implemented.');
-    // In a real app, show a modal or custom dropdown to select month/year
   });
 
   // Records Screen Ad Close Button
   document.querySelector('#records-screen .ad-banner .ad-close').addEventListener('click', (event) => {
-    event.target.closest('.ad-banner').style.display = 'none'; // Hide the ad banner
+    event.target.closest('.ad-banner').style.display = 'none';
   });
 
   // Charts Screen Segmented Control (Month/Year)
@@ -670,44 +675,20 @@ document.addEventListener('DOMContentLoaded', () => {
       segment.classList.add('active');
       const periodType = segment.dataset.period;
       alert(`Switched to ${periodType} view.`);
-      // In a real app: Re-fetch/re-render chart data for the new period type
-      renderChartsScreen('Expense', periodType, new Date()); // Example: use current date for new period type
+      renderChartsScreen('Expense', periodType, new Date()); // Re-render charts (simulated)
     });
   });
 
-  // Charts Screen Date Navigation Arrows
+  // Charts Screen Date Navigation Arrows (Simplified mock)
   document.querySelectorAll('#charts-screen .date-navigation .nav-arrow').forEach((arrow) => {
     arrow.addEventListener('click', () => {
       const direction = parseInt(arrow.dataset.direction, 10);
-      const currentPeriodText = document.getElementById('charts-current-period').textContent;
-      const activeSegment = document.querySelector('#charts-screen .segmented-control .segment.active');
-      const periodType = activeSegment ? activeSegment.dataset.period : 'month'; // Default to month
-
-      let currentDate;
-      if (periodType === 'month') {
-        // Parse month and year from text (basic parsing)
-        const [monthStr, yearStr] = currentPeriodText.split(' ');
-        const monthIndex = new Date(Date.parse(monthStr + ' 1, 2012')).getMonth(); // Parse month name
-        currentDate = new Date(parseInt(yearStr, 10), monthIndex, 1);
-        currentDate.setMonth(currentDate.getMonth() + direction);
-      } else {
-        // Year
-        currentDate = new Date(parseInt(currentPeriodText, 10), 0, 1);
-        currentDate.setFullYear(currentDate.getFullYear() + direction);
-      }
-
-      alert(
-        `Navigating ${direction === 1 ? 'forward' : 'backward'} to ${currentDate.toLocaleString('en-US', {
-          month: 'short',
-          year: 'numeric',
-        })} (simulated)`
-      );
-      // In a real app: Re-fetch/re-render chart data for the new date
-      renderChartsScreen('Expense', periodType, currentDate);
+      alert(`Navigating ${direction === 1 ? 'forward' : 'backward'} in time (simulated).`);
+      // In a real app, update date state and re-render charts
     });
   });
 
-  // Charts Screen Period Shortcuts (This Month/Last Month)
+  // Charts Screen Period Shortcuts (This Month/Last Month - Simplified mock)
   document.querySelectorAll('#charts-screen .date-navigation .period-shortcut').forEach((shortcut) => {
     shortcut.addEventListener('click', () => {
       document
@@ -716,59 +697,25 @@ document.addEventListener('DOMContentLoaded', () => {
       shortcut.classList.add('active');
       const shortcutType = shortcut.dataset.shortcut;
       alert(`Selecting ${shortcutType} (simulated).`);
-
-      // In a real app, calculate the start date for This Month or Last Month
-      const now = new Date();
-      let targetDate = new Date();
-      if (shortcutType === 'last-month') {
-        targetDate.setMonth(now.getMonth() - 1);
-      }
-      // For 'this-month', targetDate is already current month
-
-      // In a real app: Re-fetch/re-render chart data for the new period
-      renderChartsScreen('Expense', 'Month', targetDate); // Assume shortcut is always for Month
-      // Also ensure the Month/Year segmented control is set to Month
-      document.querySelector('#charts-screen .segmented-control .segment[data-period="month"]').click(); // Simulate click
+      // In a real app, calculate date range and re-render charts
     });
   });
 
   // Reports Screen Segmented Control (Analytics/Accounts)
   document.querySelectorAll('#reports-screen .segmented-control .segment').forEach((segment) => {
     segment.addEventListener('click', () => {
-      document
-        .querySelectorAll('#reports-screen .segmented-control .segment')
-        .forEach((s) => s.classList.remove('active'));
-      segment.classList.add('active');
       const reportTab = segment.dataset.reportTab;
-      showReportTab(reportTab);
+      showReportTab(reportTab); // Use the helper function
       alert(`Switched to ${reportTab} tab.`);
-      // In a real app: Fetch/render data specific to the selected tab
     });
   });
-
-  // Helper to show content for the selected report tab
-  function showReportTab(tabName) {
-    document.getElementById('accounts-report-content').classList.add('hidden');
-    document.getElementById('analytics-report-content').classList.add('hidden');
-
-    if (tabName === 'accounts') {
-      document.getElementById('accounts-report-content').classList.remove('hidden');
-      // In a real app, call render function for accounts report
-      renderReportsScreen(mockAccounts); // Re-render account summary on tab switch
-    } else if (tabName === 'analytics') {
-      document.getElementById('analytics-report-content').classList.remove('hidden');
-      // In a real app, call render function for analytics report
-    }
-  }
 
   // Reports Screen Action Buttons (Mock actions)
   document.getElementById('add-account-button').addEventListener('click', () => {
     alert('Navigate to Add Account screen.');
-    // In a real app: showScreen('add-account-screen');
   });
   document.getElementById('manage-accounts-button').addEventListener('click', () => {
     alert('Navigate to Manage Accounts screen.');
-    // In a real app: showScreen('manage-accounts-screen');
   });
 
   // Profile Screen Menu Item Clicks (Mock actions)
@@ -777,11 +724,11 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('menu-block-ads').addEventListener('click', () => alert('Block Ads action.'));
   document.getElementById('menu-settings').addEventListener('click', () => alert('Navigate to Settings screen.'));
 
-  // Add Transaction Screen Segmented Control
-  document.querySelectorAll('#add-transaction-screen .segmented-control .segment').forEach((segment) => {
+  // Add Transaction Overlay Segmented Control
+  document.querySelectorAll('#add-transaction-overlay .segmented-control .segment').forEach((segment) => {
     segment.addEventListener('click', () => {
       document
-        .querySelectorAll('#add-transaction-screen .segmented-control .segment')
+        .querySelectorAll('#add-transaction-overlay .segmented-control .segment')
         .forEach((s) => s.classList.remove('active'));
       segment.classList.add('active');
       const transactionType = segment.dataset.transactionType;
@@ -790,36 +737,30 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Add Transaction Screen Cancel Button
+  // Add Transaction Overlay Cancel Button
   document.getElementById('add-transaction-cancel').addEventListener('click', () => {
-    showScreen('records-screen'); // Go back to Records screen
+    hideOverlay(); // Hide the overlay
+    // No need to showTabScreen here, the underlying tab remains active
   });
 
-  // Account Selection Screen Close Button
+  // Account Selection Overlay Close Button
   document.getElementById('account-selection-close').addEventListener('click', () => {
-    showScreen('records-screen'); // Go back to Records screen
+    hideOverlay(); // Hide the overlay
+    // No need to showTabScreen here, the underlying tab remains active
   });
 
-  // Account Selection Screen Action Buttons (Mock actions)
+  // Account Selection Overlay Action Buttons (Mock actions)
   document.getElementById('add-vip-button').addEventListener('click', () => {
     alert('Navigate to Premium/Add VIP screen.');
-    // In a real app: showScreen('premium-screen');
+    // In a real app: hideOverlay(); showScreen('premium-screen');
   });
   document.getElementById('join-account-button').addEventListener('click', () => {
     alert('Navigate to Join Account flow.');
-    // In a real app: showScreen('join-account-screen');
+    // In a real app: hideOverlay(); showScreen('join-account-screen');
   });
 
   // --- Initial Setup ---
-  // Hide all screens except the initial one
-  screens.forEach((screen) => {
-    if (screen.id !== currentScreen) {
-      screen.classList.remove('active');
-    } else {
-      screen.classList.add('active');
-    }
-  });
-
-  // Ensure initial screen content is rendered
-  updateScreenContent(currentScreen);
+  // Start by showing only the login screen
+  showAuthScreen('login-screen');
+  // The rest of the app (#main-app) is hidden by default via CSS and showAuthScreen
 });
