@@ -1,0 +1,821 @@
+/* CSS Variables for Colors */
+:root {
+    --bg-dark: #1c1c1e;
+    --bg-dark-light: #2c2c2e;
+    --bg-dark-lighter: #333;
+    --text-light: #fff;
+    --text-dark: #1c1c1e;
+    --text-gray: #aaa;
+    --text-red: #FF6384; /* Expense color */
+    --text-green: #4BC0C0; /* Income color */
+    --accent-gold: #FFD700;
+    --border-dark: #333;
+    --shadow-dark: rgba(0, 0, 0, 0.5);
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    overflow: hidden; /* Prevent body scroll, screens will manage their own */
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Full viewport height */
+    overflow: hidden;
+}
+
+/* --- Screen Management --- */
+.screen {
+    display: none; /* Hidden by default */
+    position: absolute; /* Position screens absolutely */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    flex-direction: column; /* Use flex for header/content layout */
+    background-color: var(--bg-dark);
+    overflow: hidden; /* Manage scrolling within screen-content */
+}
+
+.screen.active {
+    display: flex; /* Show active screen */
+    z-index: 1; /* Ensure active screen is on top */
+}
+
+.screen.overlay {
+    z-index: 10; /* Higher z-index for modals/overlays */
+    background-color: var(--bg-dark); /* Or a semi-transparent background if needed */
+}
+
+.screen-content {
+    flex: 1; /* Take remaining space */
+    overflow-y: auto; /* Enable vertical scrolling for content */
+    padding-bottom: 70px; /* Add padding for bottom nav/FAB */
+}
+
+.centered-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* --- Header --- */
+.header {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    padding-top: 50px; /* Adjust for status bar area */
+    border-bottom: 1px solid var(--border-dark);
+    background-color: var(--bg-dark); /* Ensure header has background */
+    flex-shrink: 0; /* Prevent header from shrinking */
+}
+
+.header i {
+    margin-right: 15px;
+    color: var(--text-light);
+}
+
+.header i:last-child {
+     margin-right: 0; /* No margin on the last icon */
+}
+
+.header-title {
+    flex-grow: 1; /* Title takes available space */
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--text-light);
+    margin: 0;
+    padding: 0 10px; /* Padding around title */
+}
+
+.cancel-button {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    font-size: 16px;
+    padding: 0;
+    cursor: pointer;
+}
+
+.cancel-button i {
+    margin: 0; /* Remove icon margin in buttons */
+}
+
+
+/* --- Bottom Navigation --- */
+.bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 60px;
+    background-color: var(--bg-dark-light);
+    border-top: 1px solid var(--border-dark);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 5; /* Below overlays, above regular screens */
+}
+
+.nav-button {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--text-gray);
+    font-size: 12px;
+    cursor: pointer;
+    padding: 5px 0;
+    position: relative; /* Needed for active indicator */
+}
+
+.nav-button i {
+    margin-bottom: 3px;
+    color: var(--text-gray);
+}
+
+.nav-button.active {
+    color: var(--accent-gold);
+}
+
+.nav-button.active i {
+    color: var(--accent-gold);
+}
+
+.nav-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%; /* Underline width */
+    height: 2px;
+    background-color: var(--accent-gold);
+}
+
+
+.nav-button.fab {
+    width: 50px;
+    height: 50px;
+    background-color: var(--accent-gold);
+    border-radius: 25px;
+    position: relative;
+    bottom: 15px; /* Lift FAB slightly */
+    color: var(--text-dark);
+    display: flex; /* Override flex-direction column */
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px var(--shadow-dark);
+}
+
+.nav-button.fab i {
+    margin: 0; /* Remove margin */
+    color: var(--text-dark);
+}
+
+.nav-button.fab span {
+    display: none; /* Hide text label for FAB */
+}
+
+.nav-button.fab::after {
+    display: none; /* Hide underline for FAB */
+}
+
+
+/* --- Shared List Item Styles --- */
+.list-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-dark);
+    cursor: pointer;
+}
+
+.list-item:last-child {
+     border-bottom: none; /* No border on the last item */
+}
+
+.list-item .item-icon {
+    margin-right: 15px;
+    width: 24px; /* Fix icon width */
+    text-align: center;
+}
+
+.list-item .item-icon i {
+    margin: 0; /* Remove default icon margin */
+}
+
+.list-item .item-description {
+    flex-grow: 1; /* Description takes available space */
+    font-size: 16px;
+    color: var(--text-light);
+}
+
+.list-item .item-amount {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.list-item .expense {
+    color: var(--text-red);
+}
+
+.list-item .income {
+    color: var(--text-green);
+}
+
+/* --- Form Styles (Login/Register) --- */
+.form-group {
+    margin-bottom: 15px;
+    width: 100%; /* Take full width in centered content */
+    max-width: 300px; /* Max width for form elements */
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: var(--text-gray);
+}
+
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-dark);
+    border-radius: 5px;
+    background-color: var(--bg-dark-light);
+    color: var(--text-light);
+    font-size: 16px;
+    box-sizing: border-box; /* Include padding/border in element's total width/height */
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+.primary-button {
+    display: block;
+    width: 100%;
+    max-width: 300px; /* Match form width */
+    padding: 12px;
+    background-color: var(--accent-gold);
+    color: var(--text-dark);
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.primary-button:hover {
+    opacity: 0.9;
+}
+
+.primary-button:active {
+    opacity: 0.8;
+}
+
+.error-message {
+    color: var(--text-red);
+    font-size: 14px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.signup-link {
+    margin-top: 20px;
+    font-size: 14px;
+    color: var(--text-gray);
+}
+
+.signup-link a {
+    color: var(--accent-gold);
+    text-decoration: none;
+}
+
+.signup-link a:hover {
+    text-decoration: underline;
+}
+
+
+/* --- Profile Screen Specific --- */
+.profile-header {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid var(--border-dark);
+}
+
+.profile-image-placeholder {
+    width: 60px;
+    height: 60px;
+    border-radius: 30px;
+    background-color: var(--bg-dark-lighter); /* Placeholder color */
+    margin-right: 15px;
+    /* Add background-image for actual profile pic */
+}
+
+.profile-text-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--text-light);
+}
+
+.profile-id {
+    font-size: 14px;
+    color: var(--text-gray);
+}
+
+.premium-status-row {
+     background-color: var(--bg-dark-light);
+     margin-top: 10px;
+     margin-bottom: 10px;
+     /* Override default list-item padding for full width */
+     padding-left: 20px;
+     padding-right: 20px;
+}
+
+.premium-status-row .item-icon i {
+     color: var(--accent-gold);
+}
+
+.premium-status-row .item-description {
+    color: var(--accent-gold);
+    font-weight: bold;
+}
+
+.menu-list .list-item {
+     padding-left: 20px;
+     padding-right: 20px;
+}
+
+.menu-list .list-item i {
+    color: var(--accent-gold); /* Example icon color */
+}
+
+/* --- Records Screen Specific --- */
+.summary-bar {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: var(--bg-dark-light);
+    border-bottom: 1px solid var(--border-dark);
+    flex-shrink: 0; /* Prevent summary bar from shrinking */
+}
+
+.month-year-select {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 5px; /* Make clickable area larger */
+}
+
+.month-year-select span {
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--text-light);
+    margin-right: 5px;
+}
+
+.month-year-select .dropdown-arrow {
+    width: 16px;
+    height: 16px;
+    margin-right: 0;
+}
+
+.summary-values {
+    flex-grow: 1;
+    display: flex;
+    justify-content: space-around; /* Distribute space */
+    flex-wrap: wrap; /* Allow values to wrap */
+    margin-left: 10px;
+}
+
+.summary-values .summary-label {
+    font-size: 11px;
+    color: var(--text-gray);
+    margin-right: 5px;
+}
+
+.summary-values .summary-value {
+    font-size: 13px;
+    font-weight: bold;
+    margin-right: 10px; /* Space between value sets */
+}
+
+.summary-values .summary-value:last-child {
+     margin-right: 0;
+}
+
+
+.ad-banner {
+    padding: 10px;
+    background-color: #555; /* Example ad background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.ad-banner img {
+    max-width: 100%;
+    height: auto;
+}
+
+.ad-banner .ad-close {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 14px;
+    line-height: 1;
+    text-align: center;
+    cursor: pointer;
+}
+
+.transaction-list {
+    /* No specific styles needed, list-item and section-header handle layout */
+}
+
+.list-section-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 20px;
+    background-color: var(--bg-dark-light); /* Slightly lighter background */
+    border-bottom: 1px solid var(--border-dark);
+    font-size: 14px;
+    color: var(--text-gray);
+    font-weight: bold;
+}
+
+/* --- Charts Screen Specific --- */
+.segmented-control {
+    display: flex;
+    margin: 10px;
+    border-radius: 8px;
+    overflow: hidden; /* Clip segments */
+    background-color: var(--bg-dark-lighter);
+}
+
+.segmented-control .segment {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background-color: transparent;
+    color: var(--text-light);
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.segmented-control .segment.active {
+    background-color: var(--accent-gold);
+    color: var(--text-dark);
+    font-weight: bold;
+}
+
+.date-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 15px;
+     background-color: var(--bg-dark-light);
+}
+
+.date-navigation .nav-arrow {
+     background: none;
+     border: none;
+     cursor: pointer;
+     padding: 5px;
+}
+
+.date-navigation .nav-arrow i {
+     color: var(--text-light);
+     margin: 0; /* Remove default icon margin */
+}
+
+.current-period-text {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--text-light);
+    flex-grow: 1; /* Allow date text to take space */
+    text-align: center;
+}
+
+.period-shortcut {
+    background: none;
+    border: 1px solid var(--border-dark);
+    border-radius: 5px;
+    padding: 5px 10px;
+    margin-left: 10px;
+    color: var(--text-light);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.period-shortcut.active {
+    background-color: var(--accent-gold);
+    border-color: var(--accent-gold);
+    color: var(--text-dark);
+}
+
+.chart-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 10px;
+}
+
+.donut-chart-placeholder {
+    width: 200px; /* Adjust size as needed */
+    height: 200px;
+    border-radius: 50%;
+    background-color: var(--bg-dark-lighter); /* Placeholder circle */
+    position: relative;
+    margin-bottom: 20px;
+     display: flex; /* Use flex to center content */
+     justify-content: center;
+     align-items: center;
+}
+
+.donut-chart-placeholder img {
+    max-width: 100%;
+    max-height: 100%;
+    /* In a real app, this img would be replaced by a chart library render */
+}
+
+.chart-center-text {
+    position: absolute;
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--text-light);
+    /* Centered by parent flex */
+}
+
+.category-list {
+    width: 100%;
+}
+
+.category-item {
+    padding: 10px 20px; /* Adjust padding */
+}
+
+.category-item .color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+    margin-right: 10px;
+    flex-shrink: 0; /* Prevent dot from shrinking */
+}
+
+.category-item .category-label {
+    flex-grow: 1;
+    font-size: 15px;
+    color: var(--text-light);
+}
+
+.category-item .category-percentage {
+    font-size: 15px;
+    color: var(--text-gray);
+    margin-right: 15px;
+     flex-shrink: 0;
+}
+
+.category-item .category-amount {
+    font-size: 15px;
+    font-weight: bold;
+    color: var(--text-light);
+     flex-shrink: 0;
+}
+
+
+/* --- Reports Screen Specific --- */
+#accounts-report-content,
+#analytics-report-content {
+    padding: 10px;
+}
+
+#analytics-report-content.hidden {
+    display: none;
+}
+
+.summary-card {
+    background-color: var(--bg-dark-light);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+     display: flex;
+     flex-direction: column;
+}
+
+.summary-card .summary-title {
+    font-size: 16px;
+    color: var(--text-gray);
+    margin-bottom: 5px;
+}
+
+.summary-card .net-worth-value {
+    font-size: 36px;
+    font-weight: bold;
+    color: var(--text-light);
+    margin-bottom: 15px;
+}
+
+.assets-liabilities-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.summary-item {
+    flex: 1;
+    margin-right: 10px;
+}
+.summary-item:last-child {
+    margin-right: 0;
+}
+
+.summary-item .summary-label {
+    font-size: 14px;
+    color: var(--text-gray);
+    margin-bottom: 2px;
+}
+
+.summary-item .summary-value {
+    font-size: 18px;
+    color: var(--text-light);
+    font-weight: bold;
+}
+
+.button-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.action-button {
+    flex: 1;
+    background-color: var(--accent-gold);
+    color: var(--text-dark);
+    font-size: 16px;
+    font-weight: bold;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    margin: 0 5px;
+    cursor: pointer;
+    text-align: center;
+}
+.action-button:first-child { margin-left: 0; }
+.action-button:last-child { margin-right: 0; }
+
+.action-button:hover {
+    opacity: 0.9;
+}
+.action-button:active {
+    opacity: 0.8;
+}
+
+/* --- Add Transaction Screen Specific --- */
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 columns */
+    gap: 10px; /* Space between items */
+    padding: 20px 10px;
+}
+
+.category-grid-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+}
+
+.category-grid-item .icon-container {
+    background-color: var(--bg-dark-lighter);
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.category-grid-item .icon-container i {
+     color: var(--text-light);
+     margin: 0;
+     width: auto; /* Override item-icon width */
+}
+
+.category-label-text {
+    font-size: 12px;
+    color: var(--text-light);
+    word-break: break-word; /* Break long category names */
+}
+
+/* --- Account Selection Screen Specific --- */
+.account-list {
+    /* No specific styles needed, list-item handles layout */
+}
+
+.account-item .vip-label {
+    background-color: var(--accent-gold);
+    color: var(--text-dark);
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.account-item .locked-text {
+    color: var(--text-gray);
+}
+
+.account-item .locked-icon {
+    color: var(--text-gray);
+    margin-left: 10px;
+    margin-right: 0;
+     width: auto;
+}
+
+.account-item .selected-icon {
+    color: var(--accent-gold);
+    margin-left: 15px;
+    margin-right: 0;
+    width: auto;
+}
+
+.account-item.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+
+/* --- Utility/Placeholder Styles --- */
+.hidden {
+    display: none !important;
+}
+
+.loading-indicator,
+.error-message,
+.no-data-message,
+.placeholder-text {
+    text-align: center;
+    padding: 20px;
+    font-size: 16px;
+    color: var(--text-gray);
+}
+
+.error-message {
+    color: var(--text-red);
+}
+
+/* Basic hover/active feedback */
+button:hover,
+.list-item:hover,
+.category-grid-item:hover,
+.month-year-select:hover,
+.nav-arrow:hover,
+.period-shortcut:hover,
+.cancel-button:hover {
+    opacity: 0.9;
+}
+
+button:active,
+.list-item:active,
+.category-grid-item:active,
+.month-year-select:active,
+.nav-arrow:active,
+.period-shortcut:active,
+.cancel-button:active {
+    opacity: 0.7;
+}

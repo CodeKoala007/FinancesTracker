@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Money Tracker App</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <!-- Feather Icons CDN for simple icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Login Screen -->
+      <section id="login-screen" class="screen active">
+        <div class="header">
+          <h1 class="header-title">Money Tracker</h1>
+        </div>
+        <div class="screen-content centered-content">
+          <h2>Welcome Back!</h2>
+          <form id="login-form">
+            <div class="form-group">
+              <label for="login-email">Email</label>
+              <input type="email" id="login-email" required />
+            </div>
+            <div class="form-group">
+              <label for="login-password">Password</label>
+              <input type="password" id="login-password" required />
+            </div>
+            <p id="login-error" class="error-message"></p>
+            <button type="submit" class="primary-button">Login</button>
+          </form>
+          <p class="signup-link">Don't have an account? <a href="#" id="show-register">Sign Up</a></p>
+        </div>
+      </section>
+
+      <!-- Register Screen (Placeholder) -->
+      <section id="register-screen" class="screen">
+        <div class="header">
+          <h1 class="header-title">Sign Up</h1>
+        </div>
+        <div class="screen-content centered-content">
+          <h2>Create Your Account</h2>
+          <form id="register-form">
+            <div class="form-group">
+              <label for="register-name">Name</label>
+              <input type="text" id="register-name" required />
+            </div>
+            <div class="form-group">
+              <label for="register-email">Email</label>
+              <input type="email" id="register-email" required />
+            </div>
+            <div class="form-group">
+              <label for="register-password">Password</label>
+              <input type="password" id="register-password" required />
+            </div>
+            <p id="register-error" class="error-message"></p>
+            <button type="submit" class="primary-button">Sign Up</button>
+          </form>
+          <p class="signup-link">Already have an account? <a href="#" id="show-login">Login</a></p>
+        </div>
+      </section>
+
+      <!-- Records Screen -->
+      <section id="records-screen" class="screen">
+        <div class="header">
+          <i data-feather="menu"></i>
+          <h1 class="header-title">Money Tracker</h1>
+          <i data-feather="search"></i>
+          <i data-feather="calendar"></i>
+        </div>
+        <div class="screen-content">
+          <!-- Monthly Summary Bar -->
+          <div class="summary-bar">
+            <div class="month-year-select">
+              <!-- Simulate dropdown with clickable text -->
+              <span id="current-month-year">Apr 2025</span> <i data-feather="chevron-down" class="dropdown-arrow"></i>
+            </div>
+            <div class="summary-values">
+              <span class="summary-label">Expenses</span> <span class="summary-value expense">-1,191,779</span>
+              <span class="summary-label">Income</span> <span class="summary-value income">+4,239,000</span>
+              <span class="summary-label">Balance</span> <span class="summary-value">+3,047,221</span>
+            </div>
+          </div>
+
+          <!-- Ad Banner Placeholder -->
+          <div class="ad-banner">
+            <img src="https://via.placeholder.com/400x50?text=Ad+Banner" alt="Advertisement" />
+            <button class="ad-close">×</button>
+          </div>
+
+          <!-- Transaction List (Simulated SectionList) -->
+          <div class="transaction-list">
+            <!-- Section Header -->
+            <div class="list-section-header">
+              <span class="section-date">Apr 27 Sunday</span>
+              <span class="section-summary">Expenses: 29,500</span>
+            </div>
+            <!-- Transaction Item -->
+            <div class="list-item transaction-item">
+              <div class="item-icon"><i data-feather="truck"></i></div>
+              <span class="item-description">colectivo</span>
+              <span class="item-amount expense">-29,500</span>
+            </div>
+
+            <!-- Section Header -->
+            <div class="list-section-header">
+              <span class="section-date">Apr 26 Saturday</span>
+              <span class="section-summary">Expenses: 347,579 Income: 527,000</span>
+            </div>
+            <!-- Transaction Item -->
+            <div class="list-item transaction-item">
+              <div class="item-icon"><i data-feather="gift"></i></div>
+              <span class="item-description">gifts</span>
+              <span class="item-amount expense">-250,000</span>
+            </div>
+            <div class="list-item transaction-item">
+              <div class="item-icon"><i data-feather="book-open"></i></div>
+              <span class="item-description">teaching</span>
+              <span class="item-amount income">+527,000</span>
+            </div>
+            <div class="list-item transaction-item">
+              <div class="item-icon"><i data-feather="car"></i></div>
+              <span class="item-description">Uber</span>
+              <span class="item-amount expense">-60,400</span>
+            </div>
+            <div class="list-item transaction-item">
+              <div class="item-icon"><i data-feather="car"></i></div>
+              <span class="item-description">uber</span>
+              <span class="item-amount expense">-10,400</span>
+            </div>
+
+            <!-- Section Header -->
+            <div class="list-section-header">
+              <span class="section-date">Apr 23 Wednesday</span>
+              <span class="section-summary">Expenses: 235</span>
+              <!-- Note: Screenshot shows 235, but transactions below sum to more -->
+            </div>
+            <div class="list-item transaction-item">
+              <div class="item-icon"><i data-feather="car"></i></div>
+              <span class="item-description">uber</span>
+              <!-- Amount missing in screenshot, placeholder -->
+              <span class="item-amount expense">-26,777</span>
+            </div>
+            <div class="list-item transaction-item">
+              <div class="item-icon"><i data-feather="car"></i></div>
+              <span class="item-description">uber</span>
+              <span class="item-amount expense">-22,000</span>
+            </div>
+            <div class="list-item transaction-item">
+              <div class="item-icon"><i data-feather="car"></i></div>
+              <span class="item-description">uber</span>
+              <span class="item-amount expense">-43,000</span>
+            </div>
+            <div class="list-item transaction-item">
+              <div class="item-icon"><i data-feather="shopping-bag"></i></div>
+              <!-- Example icon -->
+              <span class="item-description">ara</span>
+              <span class="item-amount expense">-170,000</span>
+            </div>
+            <!-- Add more transaction items as needed for scrolling -->
+          </div>
+
+          <!-- Loading/Error Placeholder -->
+          <div id="records-loading" class="loading-indicator">Loading...</div>
+          <div id="records-error" class="error-message"></div>
+          <div id="records-no-data" class="no-data-message">No transactions for this period.</div>
+        </div>
+      </section>
+
+      <!-- Charts Screen -->
+      <section id="charts-screen" class="screen">
+        <div class="header">
+          <h1 class="header-title">Expenses <i data-feather="chevron-down" class="dropdown-arrow"></i></h1>
+        </div>
+        <div class="screen-content">
+          <!-- Month/Year Segmented Control -->
+          <div class="segmented-control">
+            <button class="segment active" data-period="month">Month</button>
+            <button class="segment" data-period="year">Year</button>
+          </div>
+
+          <!-- Date Navigation -->
+          <div class="date-navigation">
+            <button class="nav-arrow" data-direction="-1"><i data-feather="chevron-left"></i></button>
+            <span id="charts-current-period" class="current-period-text">Feb 2025</span>
+            <button class="nav-arrow" data-direction="1"><i data-feather="chevron-right"></i></button>
+            <button class="period-shortcut active" data-shortcut="this-month">This Month</button>
+            <button class="period-shortcut" data-shortcut="last-month">Last Month</button>
+          </div>
+
+          <!-- Chart Area (Simulated) -->
+          <div class="chart-area">
+            <!-- Donut Chart Placeholder -->
+            <div class="donut-chart-placeholder">
+              <div class="chart-center-text" id="charts-total-amount">+1.19 million</div>
+              <!-- In a real app, this would be an SVG or Canvas chart -->
+              <img src="https://via.placeholder.com/200x200?text=Donut+Chart" alt="Expense Distribution Chart" />
+            </div>
+
+            <!-- Category List -->
+            <div class="category-list">
+              <!-- Category Item -->
+              <div class="list-item category-item">
+                <span class="color-dot" style="background-color: #ff6384"></span>
+                <span class="category-label">Shopping</span>
+                <span class="category-percentage">33.39%</span>
+                <span class="category-amount">398,000</span>
+              </div>
+              <div class="list-item category-item">
+                <span class="color-dot" style="background-color: #36a2eb"></span>
+                <span class="category-label">Car</span>
+                <span class="category-percentage">22.59%</span>
+                <span class="category-amount">269,279</span>
+              </div>
+              <div class="list-item category-item">
+                <span class="color-dot" style="background-color: #ffce56"></span>
+                <span class="category-label">Electronics</span>
+                <span class="category-percentage">19.13%</span>
+                <span class="category-amount">228,000</span>
+              </div>
+              <div class="list-item category-item">
+                <span class="color-dot" style="background-color: #4bc0c0"></span>
+                <span class="category-label">Vegetables</span>
+                <span class="category-percentage">18.71%</span>
+                <span class="category-amount">223,000</span>
+              </div>
+              <div class="list-item category-item">
+                <span class="color-dot" style="background-color: #9966cc"></span>
+                <span class="category-label">Transportation</span>
+                <span class="category-percentage">2.47%</span>
+                <span class="category-amount">29,500</span>
+              </div>
+              <div class="list-item category-item">
+                <span class="color-dot" style="background-color: #ff9f40"></span>
+                <span class="category-label">Food</span>
+                <span class="category-percentage">2.01%</span>
+                <span class="category-amount">24,000</span>
+              </div>
+              <!-- More categories... -->
+            </div>
+          </div>
+
+          <!-- Loading/Error Placeholder -->
+          <div id="charts-loading" class="loading-indicator">Loading chart data...</div>
+          <div id="charts-error" class="error-message"></div>
+          <div id="charts-no-data" class="no-data-message">No chart data for this period.</div>
+        </div>
+      </section>
+
+      <!-- Reports Screen -->
+      <section id="reports-screen" class="screen">
+        <div class="header">
+          <h1 class="header-title">Reports</h1>
+        </div>
+        <div class="screen-content">
+          <!-- Analytics/Accounts Segmented Control -->
+          <div class="segmented-control">
+            <button class="segment" data-report-tab="analytics">Analytics</button>
+            <button class="segment active" data-report-tab="accounts">Accounts</button>
+          </div>
+
+          <!-- Accounts Report Content -->
+          <div id="accounts-report-content">
+            <div class="summary-card">
+              <span class="summary-title">Net Worth</span>
+              <span class="net-worth-value" id="net-worth-value">0</span>
+              <div class="assets-liabilities-row">
+                <div class="summary-item">
+                  <span class="summary-label">Assets</span>
+                  <span class="summary-value" id="assets-value">0</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">Liabilities</span>
+                  <span class="summary-value" id="liabilities-value">0</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="button-row">
+              <button class="action-button" id="add-account-button">Add Account</button>
+              <button class="action-button" id="manage-accounts-button">Manage Accounts</button>
+            </div>
+
+            <!-- Loading/Error Placeholder -->
+            <div id="reports-loading" class="loading-indicator">Loading summary...</div>
+            <div id="reports-error" class="error-message"></div>
+            <div id="reports-no-data" class="no-data-message">No account data found.</div>
+          </div>
+
+          <!-- Analytics Report Content (Placeholder) -->
+          <div id="analytics-report-content" class="hidden">
+            <p class="placeholder-text">Analytics content goes here...</p>
+            <!-- This would contain elements for Average Income/Expenses, Savings Ratio, etc. -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Profile Screen -->
+      <section id="profile-screen" class="screen">
+        <div class="header">
+          <h1 class="header-title">Me</h1>
+        </div>
+        <div class="screen-content">
+          <div class="profile-header">
+            <div class="profile-image-placeholder"></div>
+            <div class="profile-text-container">
+              <span class="profile-name">Edgar "Agu" A</span>
+              <span class="profile-id">ID:1565990</span>
+            </div>
+          </div>
+
+          <div class="premium-status-row list-item">
+            <div class="item-icon"><i data-feather="crown"></i></div>
+            <span class="item-description">Premium Member</span>
+            <i data-feather="chevron-right"></i>
+          </div>
+
+          <div class="menu-list">
+            <div class="list-item menu-item" id="menu-recommend">
+              <div class="item-icon"><i data-feather="users"></i></div>
+              <span class="item-description">Recommend to friends</span>
+              <i data-feather="chevron-right"></i>
+            </div>
+            <div class="list-item menu-item" id="menu-rate">
+              <div class="item-icon"><i data-feather="star"></i></div>
+              <span class="item-description">Rate the app</span>
+              <i data-feather="chevron-right"></i>
+            </div>
+            <div class="list-item menu-item" id="menu-block-ads">
+              <div class="item-icon"><i data-feather="x-octagon"></i></div>
+              <span class="item-description">Block Ads</span>
+              <i data-feather="chevron-right"></i>
+            </div>
+            <div class="list-item menu-item" id="menu-settings">
+              <div class="item-icon"><i data-feather="settings"></i></div>
+              <span class="item-description">Settings</span>
+              <i data-feather="chevron-right"></i>
+            </div>
+          </div>
+
+          <!-- Loading/Error Placeholder -->
+          <div id="profile-loading" class="loading-indicator">Loading profile...</div>
+          <div id="profile-error" class="error-message"></div>
+        </div>
+      </section>
+
+      <!-- Add Transaction Screen (Modal/Overlay) -->
+      <section id="add-transaction-screen" class="screen overlay">
+        <div class="header">
+          <button class="cancel-button" id="add-transaction-cancel">Cancel</button>
+          <h1 class="header-title">Add</h1>
+          <i data-feather="camera"></i>
+        </div>
+        <div class="screen-content">
+          <!-- Expense/Income/Transfer Segmented Control -->
+          <div class="segmented-control">
+            <button class="segment active" data-transaction-type="Expense">Expense</button>
+            <button class="segment" data-transaction-type="Income">Income</button>
+            <button class="segment" data-transaction-type="Transfer">Transfer</button>
+          </div>
+
+          <!-- Category Grid -->
+          <div class="category-grid" id="category-grid">
+            <!-- Category items will be injected here by JS -->
+            <!-- Example Item -->
+            <!-- <div class="category-grid-item">
+                         <div class="icon-container"><i data-feather="shopping-cart"></i></div>
+                         <span class="category-label-text">Shopping</span>
+                     </div> -->
+          </div>
+
+          <!-- Loading/Error Placeholder -->
+          <div id="add-transaction-loading" class="loading-indicator">Loading categories...</div>
+          <div id="add-transaction-error" class="error-message"></div>
+          <div id="add-transaction-no-data" class="no-data-message">No categories found.</div>
+        </div>
+      </section>
+
+      <!-- Account Selection Screen (Modal/Overlay) -->
+      <section id="account-selection-screen" class="screen overlay">
+        <div class="header">
+          <h1 class="header-title">Select Account</h1>
+          <button class="cancel-button" id="account-selection-close"><i data-feather="x"></i></button>
+        </div>
+        <div class="screen-content">
+          <div class="account-list" id="account-list">
+            <!-- Account items will be injected here by JS -->
+            <!-- Example Item -->
+            <!-- <div class="list-item account-item">
+                          <div class="item-icon"><i data-feather="dollar-sign"></i></div>
+                          <div class="account-text-container">
+                              <span class="account-name">Default</span>
+                              <span class="account-description">Personal cash book</span>
+                          </div>
+                          <i data-feather="check" class="selected-icon"></i>
+                      </div> -->
+          </div>
+
+          <div class="button-row">
+            <button class="action-button" id="add-vip-button">Add VIP</button>
+            <button class="action-button" id="join-account-button">Join</button>
+          </div>
+
+          <!-- Loading/Error Placeholder -->
+          <div id="account-selection-loading" class="loading-indicator">Loading accounts...</div>
+          <div id="account-selection-error" class="error-message"></div>
+          <div id="account-selection-no-data" class="no-data-message">No accounts found.</div>
+        </div>
+      </section>
+
+      <!-- Bottom Navigation Bar -->
+      <nav class="bottom-nav">
+        <button class="nav-button active" data-screen="records">
+          <i data-feather="file-text"></i>
+          <span>Records</span>
+        </button>
+        <button class="nav-button" data-screen="charts">
+          <i data-feather="bar-chart-2"></i>
+          <span>Charts</span>
+        </button>
+        <button class="nav-button fab" data-screen="add-transaction">
+          <i data-feather="plus"></i>
+        </button>
+        <button class="nav-button" data-screen="reports">
+          <i data-feather="clipboard"></i>
+          <span>Reports</span>
+        </button>
+        <button class="nav-button" data-screen="profile">
+          <i data-feather="user"></i>
+          <span>Me</span>
+        </button>
+      </nav>
+    </div>
+
+    <script src="js/script.js"></script>
+    <script>
+      // Replace feather icons after the DOM is loaded
+      feather.replace();
+    </script>
+  </body>
+</html>
